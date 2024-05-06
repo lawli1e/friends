@@ -12,10 +12,9 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  List<String> activities = []; // รายการกิจกรรมที่เข้าร่วม
-  List<String> posts = []; // รายการกิจกรรมที่โพสต์
+  List<Map<String, dynamic>> activities = []; // รายการกิจกรรมที่เข้าร่วม
+  List<Map<String, dynamic>> posts = []; // รายการกิจกรรมที่โพสต์
   late String token;
-
 
   @override
   void initState() {
@@ -49,7 +48,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   // เมธอดสำหรับโหลดข้อมูลกิจกรรมที่เข้าร่วมจากเซิร์ฟเวอร์
-  Future<List<String>> getActivities() async {
+  Future<List<Map<String, dynamic>>> getActivities() async {
     try {
       final response = await http.get(
         Uri.parse('http://localhost:8080/user_activities'),
@@ -60,8 +59,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
       );
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
-        final List<String> activities =
-        data.map((e) => e.toString()).toList();
+        final List<Map<String, dynamic>> activities = data.map((activity) {
+          return {
+            'userId': activity['userId'],
+            'title': activity['title'],
+            'description': activity['description'],
+            'joinedAt': activity['joinedAt'],
+          };
+        }).toList();
         return activities;
       } else {
         throw Exception('Failed to load activities');
@@ -72,7 +77,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   // เมธอดสำหรับโหลดข้อมูลกิจกรรมที่โพสต์จากเซิร์ฟเวอร์
-  Future<List<String>> getPosts() async {
+  Future<List<Map<String, dynamic>>> getPosts() async {
     try {
       final response = await http.get(
         Uri.parse('http://localhost:8080/user_posts'),
@@ -84,7 +89,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
-        final List<String> posts = data.map((e) => e.toString()).toList();
+        final List<Map<String, dynamic>> posts = List<Map<String, dynamic>>.from(data);
         return posts;
       } else {
         throw Exception('Failed to load posts');
@@ -124,8 +129,37 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: ListView.builder(
                       itemCount: activities.length,
                       itemBuilder: (BuildContext context, int index) {
-                        return ListTile(
-                          title: Text(activities[index]),
+                        return Card(
+                          elevation: 2.0,
+                          margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                          child: Padding(
+                            padding: EdgeInsets.all(16.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Title: ${activities[index]['title']}',
+                                  style: TextStyle(
+                                    fontSize: 16.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                SizedBox(height: 8.0),
+                                Text(
+                                  'UserID: ${activities[index]['userId']}',
+                                  style: TextStyle(fontSize: 14.0),
+                                ),
+                                Text(
+                                  'Description: ${activities[index]['description']}',
+                                  style: TextStyle(fontSize: 14.0),
+                                ),
+                                Text(
+                                  'JoinedAt: ${activities[index]['joinedAt']}',
+                                  style: TextStyle(fontSize: 14.0),
+                                ),
+                              ],
+                            ),
+                          ),
                         );
                       },
                     ),
@@ -133,6 +167,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ],
               ),
             const SizedBox(height: 20.0),
+            // แก้ไขส่วนที่ใช้ในการแสดงรายการกิจกรรมที่โพสต์
             if (posts.isNotEmpty)
               Column(
                 children: [
@@ -145,8 +180,45 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: ListView.builder(
                       itemCount: posts.length,
                       itemBuilder: (BuildContext context, int index) {
-                        return ListTile(
-                          title: Text(posts[index]),
+                        return Card(
+                          elevation: 2.0,
+                          margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                          child: Padding(
+                            padding: EdgeInsets.all(16.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  posts[index]['title'], // เข้าถึงชื่อ title ของกิจกรรม
+                                  style: TextStyle(
+                                    fontSize: 16.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                SizedBox(height: 8.0),
+                                Text(
+                                  'UserID: ${posts[index]['userId']}', // แสดงข้อมูล userID
+                                  style: TextStyle(fontSize: 14.0),
+                                ),
+                                Text(
+                                  'Description: ${posts[index]['description']}', // แสดงข้อมูล description
+                                  style: TextStyle(fontSize: 14.0),
+                                ),
+                                Text(
+                                  'Max Participants: ${posts[index]['maxParticipants']}', // แสดงข้อมูล maxParticipants
+                                  style: TextStyle(fontSize: 14.0),
+                                ),
+                                Text(
+                                  'Category: ${posts[index]['category']}', // แสดงข้อมูล category
+                                  style: TextStyle(fontSize: 14.0),
+                                ),
+                                Text(
+                                  'Event Start: ${posts[index]['eventStart']}', // แสดงข้อมูล eventStart
+                                  style: TextStyle(fontSize: 14.0),
+                                ),
+                              ],
+                            ),
+                          ),
                         );
                       },
                     ),

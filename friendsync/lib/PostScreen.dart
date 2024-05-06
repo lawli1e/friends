@@ -18,22 +18,25 @@ class PostWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      title: Text(title),
-      subtitle: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(location),
-          Text(eventStart),
-          Text('Max Participants: $maxParticipants'),
-          Text('Created by: $creatorName'),
-        ],
-      ),
-      trailing: ElevatedButton(
-        onPressed: () {
-          // Handle join action
-        },
-        child: Text('Join'),
+    return Container(
+      decoration: BoxDecoration(color: Colors.orange), // Use Colors.orange
+      child: ListTile(
+        title: Text(title),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(location),
+            Text(eventStart),
+            Text('Max Participants: $maxParticipants'),
+            Text('Created by: $creatorName'),
+          ],
+        ),
+        trailing: ElevatedButton(
+          onPressed: () {
+            // Handle join action
+          },
+          child: Text('Join'),
+        ),
       ),
     );
   }
